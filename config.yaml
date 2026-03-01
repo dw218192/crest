@@ -1,0 +1,20 @@
+repo:
+  tokens:
+    unity_editor_dir:
+      env: UNITY_EDITOR_DIR
+      value: "C:/Program Files/Unity/Hub/Editor/6000.3.10f1/Editor"
+      path: true
+    unity_project: "{workspace_root}/crest"
+
+build:
+  steps:
+    - command: "\"{unity_editor_dir}/Unity.exe\" -batchmode -nographics -quit -projectPath \"{unity_project}\" -logFile -"
+
+test:
+  steps:
+    - command: "\"{unity_editor_dir}/Unity.exe\" -batchmode -nographics -quit -projectPath \"{unity_project}\" -runTests -testResults \"{workspace_root}/_build/test-results.xml\" -logFile -"
+
+publish:
+  steps:
+    - "git subtree split --prefix=crest/Assets/Crest -b package"
+    - "git push origin webgpu-support package"
