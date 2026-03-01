@@ -28,7 +28,7 @@ namespace Crest
     {
         public override string SimName => "AnimatedWaves";
         // shape format. i tried RGB111110Float but error becomes visible. one option would be to use a UNORM setup.
-        protected override GraphicsFormat RequestedTextureFormat => Settings._renderTextureGraphicsFormat;
+        protected override GraphicsFormat RequestedTextureFormat => Settings.RenderTextureGraphicsFormat;
         protected override bool NeedToReadWriteTextureData => true;
         public override int BufferCount => _bufferCount;
 

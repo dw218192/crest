@@ -173,7 +173,12 @@ namespace Crest
             _tempFFT3.Create();
 
             // Raw wave data buffer
-            _waveBuffers = new RenderTexture(_resolution, _resolution, 0, GraphicsFormat.R16G16B16A16_SFloat);
+#if UNITY_2023_1_OR_NEWER
+            var waveFormat = OceanRenderer.IsWebGPU ? GraphicsFormat.R32G32B32A32_SFloat : GraphicsFormat.R16G16B16A16_SFloat;
+#else
+            var waveFormat = GraphicsFormat.R16G16B16A16_SFloat;
+#endif
+            _waveBuffers = new RenderTexture(_resolution, _resolution, 0, waveFormat);
             _waveBuffers.wrapMode = TextureWrapMode.Repeat;
             _waveBuffers.antiAliasing = 1;
             _waveBuffers.filterMode = FilterMode.Bilinear;

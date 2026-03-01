@@ -63,6 +63,15 @@ namespace Crest
         [Tooltip("The render texture format to use for the wave simulation. It should only be changed if you need more precision. See the documentation for information.")]
         public GraphicsFormat _renderTextureGraphicsFormat = GraphicsFormat.R16G16B16A16_SFloat;
 
+        public GraphicsFormat RenderTextureGraphicsFormat =>
+#if UNITY_2023_1_OR_NEWER
+            OceanRenderer.IsWebGPU && _renderTextureGraphicsFormat == GraphicsFormat.R16G16B16A16_SFloat
+                ? GraphicsFormat.R32G32B32A32_SFloat
+                : _renderTextureGraphicsFormat;
+#else
+            _renderTextureGraphicsFormat;
+#endif
+
 #if CREST_UNITY_MATHEMATICS
         [Predicated("_collisionSource", true, (int)CollisionSources.BakedFFT), DecoratedField]
         public FFTBakedData _bakedFFTData;
