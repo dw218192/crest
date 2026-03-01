@@ -49,13 +49,23 @@ namespace Crest
         [Header("Developer settings")]
         [Tooltip("The render texture format to use for the foam simulation. This is mostly for debugging and should be left at its default.")]
         public GraphicsFormat _renderTextureGraphicsFormat = GraphicsFormat.R16_SFloat;
+
+        public GraphicsFormat RenderTextureGraphicsFormat =>
+#if UNITY_2023_1_OR_NEWER
+            OceanRenderer.IsWebGPU && _renderTextureGraphicsFormat == GraphicsFormat.R16_SFloat
+                ? GraphicsFormat.R32_SFloat
+                : _renderTextureGraphicsFormat;
+#else
+            _renderTextureGraphicsFormat;
+#endif
+
         [Range(15f, 200f), Tooltip("Frequency to run the foam sim, in updates per second. Lower frequencies can be more efficient but may lead to visible jitter. Default is 30 updates per second.")]
         public float _simulationFrequency = 30f;
 
         public override void AddToSettingsHash(ref int settingsHash)
         {
             base.AddToSettingsHash(ref settingsHash);
-            Hashy.AddInt((int)_renderTextureGraphicsFormat, ref settingsHash);
+            Hashy.AddInt((int)RenderTextureGraphicsFormat, ref settingsHash);
         }
 
 #if UNITY_EDITOR

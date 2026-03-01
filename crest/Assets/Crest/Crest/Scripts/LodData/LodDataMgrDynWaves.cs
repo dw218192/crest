@@ -19,7 +19,14 @@ namespace Crest
         protected override int krnl_ShaderSim => _shader.FindKernel(ShaderSim);
 
         public override string SimName => "DynamicWaves";
-        protected override GraphicsFormat RequestedTextureFormat => GraphicsFormat.R16G16_SFloat;
+        protected override GraphicsFormat RequestedTextureFormat =>
+#if UNITY_2023_1_OR_NEWER
+            OceanRenderer.IsWebGPU
+                ? GraphicsFormat.R32G32_SFloat
+                : GraphicsFormat.R16G16_SFloat;
+#else
+            GraphicsFormat.R16G16_SFloat;
+#endif
         static Texture2DArray s_nullTexture => TextureArrayHelpers.BlackTextureArray;
         protected override Texture2DArray NullTexture => s_nullTexture;
 

@@ -179,7 +179,11 @@ namespace Crest
             // @Memory: We could investigate making this an 8-bit texture instead to reduce GPU memory usage.
             // @Memory: We could potentially try a half resolution mask as the mensicus could mask resolution issues.
             // Intel iGPU for Metal and DirectX both had issues with R16. 2021.11.18
-            descriptor.colorFormat = Helpers.IsIntelGPU() ? RenderTextureFormat.RFloat : RenderTextureFormat.RHalf;
+            descriptor.colorFormat = (Helpers.IsIntelGPU()
+#if UNITY_2023_1_OR_NEWER
+                || OceanRenderer.IsWebGPU
+#endif
+                ) ? RenderTextureFormat.RFloat : RenderTextureFormat.RHalf;
             descriptor.depthBufferBits = 0;
             descriptor.enableRandomWrite = true;
 

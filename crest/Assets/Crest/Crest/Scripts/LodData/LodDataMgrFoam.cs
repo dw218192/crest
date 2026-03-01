@@ -17,7 +17,7 @@ namespace Crest
         protected override string ShaderSim => "UpdateFoam";
         protected override int krnl_ShaderSim => _shader.FindKernel(ShaderSim);
         public override string SimName => "Foam";
-        protected override GraphicsFormat RequestedTextureFormat => Settings._renderTextureGraphicsFormat;
+        protected override GraphicsFormat RequestedTextureFormat => Settings.RenderTextureGraphicsFormat;
         static Texture2DArray s_nullTexture => TextureArrayHelpers.BlackTextureArray;
         protected override Texture2DArray NullTexture => s_nullTexture;
 
