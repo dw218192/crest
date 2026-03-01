@@ -495,6 +495,11 @@ namespace Crest
         /// </summary>
         public static bool RunningHeadless => Application.isBatchMode || (Instance != null ? Instance._debug._forceBatchMode : false);
 
+#if UNITY_2023_1_OR_NEWER
+        internal static bool IsWebGPU =>
+            SystemInfo.graphicsDeviceType == GraphicsDeviceType.WebGPU;
+#endif
+
         // We are computing these values to be optimal based on the base mesh vertex density.
         float _lodAlphaBlackPointFade;
         float _lodAlphaBlackPointWhitePointFade;
@@ -997,7 +1002,11 @@ namespace Crest
         {
             if (!RunningWithoutGPU)
             {
-                if (Application.platform == RuntimePlatform.WebGLPlayer)
+                if (Application.platform == RuntimePlatform.WebGLPlayer
+#if UNITY_2023_1_OR_NEWER
+                    && SystemInfo.graphicsDeviceType != GraphicsDeviceType.WebGPU
+#endif
+                    )
                 {
                     Debug.LogError("Crest: Crest does not support WebGL backends.", this);
                     return false;
