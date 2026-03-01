@@ -92,6 +92,10 @@ namespace Crest
             Debug.Assert(Mathf.NextPowerOfTwo(resolution) == resolution, "Crest: FFTCompute resolution must be power of 2");
 
             _resolution = resolution;
+#if UNITY_2023_1_OR_NEWER
+            if (OceanRenderer.IsWebGPU)
+                _resolution = Mathf.Min(_resolution, 256);
+#endif
             _loopPeriod = loopPeriod;
             _windSpeed = windSpeed;
             _windTurbulence = windTurbulence;
