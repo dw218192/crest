@@ -3,3 +3,12 @@
 .vsconfig/
 .vscode/
 .mono/
+
+# repokit
+_tools/
+tools/pyproject.toml
+tools/uv.lock
+repo
+repo.cmd
+_agent/
+config.local.yaml
