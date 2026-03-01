@@ -469,19 +469,39 @@ namespace Crest
             {
                 ExecuteQueries();
 
-                // Remove oldest requests if we have hit the limit
-                while (_requests.Count >= s_maxRequests)
+#if UNITY_2023_1_OR_NEWER
+                if (OceanRenderer.IsWebGPU)
                 {
-                    _requests.RemoveAt(0);
+                    var resultData = new Vector3[_segmentRegistrarRingBuffer.Current._numQueries];
+                    _computeBufResults.GetData(resultData, 0, 0, _segmentRegistrarRingBuffer.Current._numQueries);
+
+                    Helpers.Swap(ref _queryResults, ref _queryResultsLast);
+                    _queryResultsTimeLast = _queryResultsTime;
+                    _resultSegmentsLast = _resultSegments;
+
+                    NativeArray<Vector3>.Copy(resultData, _queryResults);
+                    _queryResultsTime = Time.time - Time.deltaTime;
+                    _resultSegments = _segmentRegistrarRingBuffer.Current._segments;
+
+                    _segmentRegistrarRingBuffer.AcquireNew();
                 }
+                else
+#endif
+                {
+                    // Remove oldest requests if we have hit the limit
+                    while (_requests.Count >= s_maxRequests)
+                    {
+                        _requests.RemoveAt(0);
+                    }
 
-                ReadbackRequest request;
-                request._dataTimestamp = Time.time - Time.deltaTime;
-                request._request = AsyncGPUReadback.Request(_computeBufResults, _dataArrivedAction);
-                request._segments = _segmentRegistrarRingBuffer.Current._segments;
-                _requests.Add(request);
+                    ReadbackRequest request;
+                    request._dataTimestamp = Time.time - Time.deltaTime;
+                    request._request = AsyncGPUReadback.Request(_computeBufResults, _dataArrivedAction);
+                    request._segments = _segmentRegistrarRingBuffer.Current._segments;
+                    _requests.Add(request);
 
-                _segmentRegistrarRingBuffer.AcquireNew();
+                    _segmentRegistrarRingBuffer.AcquireNew();
+                }
             }
         }
 
