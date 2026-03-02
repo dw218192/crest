@@ -14,20 +14,6 @@ test:
   steps:
     - command: "\"{unity_editor_dir}/Unity.exe\" -batchmode -nographics -quit -projectPath \"{unity_project}\" -runTests -testResults \"{workspace_root}/_build/test-results.xml\" -logFile -"
 
-publish:
-  steps:
-    - command: >-
-        bash -c '
-        tree=$(git rev-parse HEAD:crest/Assets/Crest) &&
-        msg="Publish from $(git rev-parse --short HEAD) - $(git log -1 --format=%s)" &&
-        commit=$(git commit-tree "$tree" -p package -m "$msg") &&
-        git update-ref refs/heads/package "$commit"
-        '
-    - command: >-
-        bash -c '
-        git push origin "$(git rev-parse --abbrev-ref HEAD)" package
-        '
-
 clean:
   paths:
     - "{unity_project}/Temp"
