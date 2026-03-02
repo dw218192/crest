@@ -241,7 +241,7 @@ half3 OceanEmission
 			depthFogDistance = max(sceneZ - i_pixelZ, 0.0);
 		}
 
-		sceneColour = SAMPLE_TEXTURE2D_X(_BackgroundTexture, sampler_BackgroundTexture, uvBackgroundRefract).rgb;
+		sceneColour = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_BackgroundTexture, uvBackgroundRefract).rgb;
 #if _CAUSTICS_ON
 #if CREST_WATER_VOLUME_HAS_BACKFACE
 		if (caustics)
@@ -256,7 +256,7 @@ half3 OceanEmission
 	else
 	{
 		const float2 uvBackgroundRefract = rawDepth < i_rawPixelZ ? uvBackground + refractOffset : uvBackground;
-		sceneColour = SAMPLE_TEXTURE2D_X(_BackgroundTexture, sampler_BackgroundTexture, uvBackgroundRefract).rgb;
+		sceneColour = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_BackgroundTexture, uvBackgroundRefract).rgb;
 		depthFogDistance = i_pixelZ;
 		// keep alpha at 0 as UnderwaterReflection shader handles the blend
 		// appropriately when looking at water from below

@@ -21,11 +21,6 @@ Shader "Crest/Underwater Curtain"
 	{
 		Tags{ "LightMode" = "ForwardBase" "Queue" = "Geometry+510" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
 
-		GrabPass
-		{
-			"_BackgroundTexture"
-		}
-
 		Pass
 		{
 			// The ocean surface will render after the skirt, and overwrite the pixels
@@ -168,7 +163,7 @@ Shader "Crest/Underwater Curtain"
 
 				o.foam_screenPos.x = 0.0;
 				o.foam_screenPos.yzw = ComputeScreenPos(o.positionCS).xyw;
-				o.grabPos = ComputeGrabScreenPos(o.positionCS);
+				o.grabPos = ComputeScreenPos(o.positionCS);
 
 				o.uv = input.uv;
 
@@ -215,7 +210,7 @@ Shader "Crest/Underwater Curtain"
 
 				const half3 scatterCol = ScatterColour(seaFloorDepth, shadow, sss, view, _CrestAmbientLighting, lightDir, lightCol, true);
 
-				half3 sceneColour = SAMPLE_TEXTURE2D_X(_BackgroundTexture, sampler_BackgroundTexture, input.grabPos.xy / input.grabPos.w).rgb;
+				half3 sceneColour = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_BackgroundTexture, input.grabPos.xy / input.grabPos.w).rgb;
 
 #if _CAUSTICS_ON
 				if (sceneZ01 != 0.0)
