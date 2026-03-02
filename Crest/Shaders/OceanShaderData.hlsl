@@ -11,7 +11,7 @@
 // Samplers
 
 TEXTURE2D_X(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture);
-UNITY_DECLARE_SCREENSPACE_TEXTURE(_BackgroundTexture);
+TEXTURE2D_X(_BackgroundTexture); SAMPLER(sampler_BackgroundTexture);
 
 half3 _CrestAmbientLighting;
 
