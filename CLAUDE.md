@@ -1,0 +1,103 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+Crest is an advanced ocean/water rendering system for Unity (Built-In Render Pipeline). Version 4.22.4, MIT licensed, by Wave Harmonic. Requires Unity 2020.3+; the project itself uses Unity 6 (6000.3.10f1).
+
+## Build & Test Commands
+
+All commands go through repokit. The CLI prefix is:
+```
+"C:/Repos/crest/_tools/venv/Scripts/python.exe" -m repo_tools.cli --workspace-root "C:/Repos/crest"
+```
+
+| Task | Command |
+|------|---------|
+| Build | `<cli> build` |
+| Test | `<cli> test` |
+| Publish | `<cli> publish` (snapshots `crest/Assets/Crest` subtree onto `package` branch) |
+| Clean | `<cli> clean` (removes `crest/Temp`, `crest/Logs`) |
+
+Build and test invoke Unity in batch mode. Test results go to `_build/test-results.xml`.
+
+## Repository Layout
+
+```
+crest/                      Unity project root
+  Assets/Crest/Crest/       Core package (the publishable artifact)
+    Scripts/                 C# source (~116 files)
+    Shaders/                 HLSL/shader files (~90 files)
+    Materials/, Data/, Icons/, Textures/
+  Assets/Crest/Crest-Examples/  Example scenes (BoatDev, LakesAndRivers, Main, Whirlpool)
+  Assets/Development/       Dev-only tools (dashboard, validators)
+docs/                       Sphinx documentation (ReadTheDocs)
+config.yaml                 Repokit build/test/publish/clean config
+_agent/                     Repokit agent plugins (do not modify)
+dev_tools/                  Git submodule → repokit framework
+```
+
+## Architecture
+
+### Core Singleton
+`OceanRenderer` — central manager, singleton via `OceanRenderer.Instance`. Partial class (includes `OceanRenderer.BackgroundCapture.cs`). Configures all simulation subsystems, manages viewpoint/camera, wind, gravity, LOD count/resolution.
+
+### LOD Data System
+`LodDataMgr` base class → concrete managers for each data type, using texture arrays for cascaded LOD storage:
+- **AnimWaves** — wave displacements (RGB=XYZ, A=variance)
+- **SeaFloorDepth** — ocean depth for shallow water
+- **Foam** — foam generation/dissipation
+- **DynWaves** — dynamic waves from object interaction
+- **Flow** — horizontal currents
+- **Shadow**, **Albedo**, **ClipSurface**
+- **Persistent** — base for simulations with frame-to-frame state
+
+MAX_LOD_COUNT = 15, thread group size 8x8.
+
+### Input Registration
+`RegisterLodDataInputBase` / `ILodDataInput` interface — components register themselves as inputs to specific LOD data types. Specialized classes per data type (`RegisterAnimWavesInput`, `RegisterFoamInput`, etc.).
+
+### Wave Generation
+- **`ShapeFFT`** — primary wave method; FFT compute pipeline (`FFTCompute`, `FFTBaker`, `FFTBakedData`)
+- **`ShapeGerstner`** / **`ShapeGerstnerBatched`** — alternative Gerstner waves
+- **`OceanWaveSpectrum`** — ScriptableObject defining wave spectrum parameters
+
+### Geometry
+`OceanBuilder` generates tile patches (Interior, Fat, FatX, FatXZ, etc.) with rotational symmetry. `OceanChunkRenderer` sets per-tile shader parameters via MaterialPropertyBlock.
+
+### Collision / Queries
+`CollProvider` interface → `CollProviderBakedFFT` for baked data. GPU readback queries (`QueryBase`, `QueryDisplacements`, `QueryFlow`). CPU sampling via `SamplingHelpers`.
+
+### Underwater Rendering
+`UnderwaterRenderer` (partial class, 3 files) — supports FullScreen, Portal, Volume, and Volume FlyThrough modes.
+
+### Shader Architecture
+- Main: `Ocean.shader` — PBR ocean with normals, scattering, SSS, foam, reflections, refraction, caustics
+- `OceanConstants.hlsl` — shared constants that **must match** values in `LodDataMgr.cs` and `PropertyWrapper.cs`
+- `OceanInputs/` — input shaders per LOD data type
+- `Resources/` — compute shaders (FFT, Gerstner, query, combine, foam, dynamic waves)
+- `Helpers/BIRP/` — BIRP-specific lighting/shadow helpers
+
+## Key Conventions
+
+- **Namespace**: `Crest`, `Crest.Internal`, `Crest.Spline`, `Crest.CrestEditor`
+- **Member variables**: lower camelCase with underscore prefix: `_exampleVariable`
+- **Serialized fields**: private with `[SerializeField]` + `[Tooltip]` for inspector-visible ones
+- **Base class**: `CustomMonoBehaviour` (custom edit-mode support instead of Unity's `[ExecuteAlways]`)
+- **Edit mode**: `[ExecuteDuringEditMode]` attribute
+- **Partial classes**: used for large classes (OceanRenderer, UnderwaterRenderer, Spline, WaterBody)
+- **Editor code**: guarded with `#if UNITY_EDITOR`, in same file or `Editor/` subfolder
+- **Validation**: `IValidated` interface + `ValidatedEditor` base editor class
+- **Property wrappers**: `IPropertyWrapper` → `PropertyWrapperMaterial`, `PropertyWrapperMPB`, `PropertyWrapperCompute` for unified shader property setting
+- **Version migration**: components carry `[SerializeField, HideInInspector] int _version`
+- **File headers**: every .cs file starts with `// Crest Ocean System` + MIT license comment
+- **C#↔HLSL constants**: values in `OceanConstants.hlsl` must match C# counterparts — update both sides together
+- **Commit messages**: 50-char summary line per [git-style-guide](https://github.com/agis/git-style-guide)
+- **Scripting define**: `CREST_OCEAN` auto-added when Crest source is present (see `ScriptingDefineSymbols.cs`)
+
+## Branches
+
+- `master` — main branch for PRs
+- `package` — published package subtree (auto-generated by `publish` command)
+- `webgpu-support` — active work adding WebGPU platform compatibility

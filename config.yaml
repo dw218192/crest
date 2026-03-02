@@ -23,8 +23,10 @@ publish:
         commit=$(git commit-tree "$tree" -p package -m "$msg") &&
         git update-ref refs/heads/package "$commit"
         '
-      description: "Snapshot subtree onto package branch"
-    - "git push origin webgpu-support package"
+    - command: >-
+        bash -c '
+        git push origin "$(git rev-parse --abbrev-ref HEAD)" package
+        '
 
 clean:
   paths:
