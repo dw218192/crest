@@ -18,3 +18,8 @@ publish:
   steps:
     - "git subtree split --prefix=crest/Assets/Crest -b package"
     - "git push origin webgpu-support package"
+
+clean:
+  paths:
+    - "{unity_project}/Temp"
+    - "{unity_project}/Logs"
