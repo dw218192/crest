@@ -214,6 +214,11 @@ Shader "Crest/Ocean"
 			"DisableBatching"="True"
 		}
 
+		GrabPass
+		{
+			"_BackgroundTexture"
+		}
+
 		Pass
 		{
 			// Culling user defined - can be inverted for under water
@@ -453,7 +458,7 @@ Shader "Crest/Ocean"
 				// unfortunate hoop jumping - this is inputs for refraction. depending on whether HDR is on or off, the grabbed scene
 				// colours may or may not come from the backbuffer, which means they may or may not be flipped in y. use these macros
 				// to get the right results, every time.
-				o.grabPos = ComputeScreenPos(o.positionCS);
+				o.grabPos = ComputeGrabScreenPos(o.positionCS);
 				o.screenPosXYW = ComputeScreenPos(o.positionCS).xyw;
 				return o;
 			}

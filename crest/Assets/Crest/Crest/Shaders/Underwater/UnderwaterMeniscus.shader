@@ -101,7 +101,7 @@ Shader "Crest/Underwater Meniscus"
 
 				o.foam_screenPos.yzw = ComputeScreenPos(o.positionCS).xyw;
 				o.foam_screenPos.x = 0.0;
-				o.grabPos = ComputeScreenPos(o.positionCS);
+				o.grabPos = ComputeGrabScreenPos(o.positionCS);
 
 				o.uv = input.uv;
 

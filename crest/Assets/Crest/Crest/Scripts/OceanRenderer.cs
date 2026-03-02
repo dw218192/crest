@@ -729,8 +729,6 @@ namespace Crest
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
             RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
 
-            EnableBackgroundCapture();
-
             Container.SetActive(true);
         }
 
@@ -1621,8 +1619,6 @@ namespace Crest
             Camera.onPreRender -= OnPreRenderCamera;
             Camera.onPostRender -= OnPostRenderCamera;
             RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
-
-            DisableBackgroundCapture();
 
             if (Container != null)
             {
