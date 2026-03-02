@@ -16,7 +16,14 @@ test:
 
 publish:
   steps:
-    - "git subtree split --prefix=crest/Assets/Crest -b package"
+    - command: >-
+        bash -c '
+        tree=$(git rev-parse HEAD:crest/Assets/Crest) &&
+        msg="Publish from $(git rev-parse --short HEAD) - $(git log -1 --format=%s)" &&
+        commit=$(git commit-tree "$tree" -p package -m "$msg") &&
+        git update-ref refs/heads/package "$commit"
+        '
+      description: "Snapshot subtree onto package branch"
     - "git push origin webgpu-support package"
 
 clean:
