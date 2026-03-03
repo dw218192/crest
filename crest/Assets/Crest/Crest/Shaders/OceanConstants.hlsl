@@ -18,7 +18,7 @@
 
 // NOTE: Must match k_DepthBaseline in LodDataMgrSeaFloorDepth.cs.
 // Bias ocean floor depth so that default (0) values in texture are not interpreted as shallow and generating foam everywhere
-#define CREST_OCEAN_DEPTH_BASELINE asfloat(0x7F800000)
+#define CREST_OCEAN_DEPTH_BASELINE CREST_FLOAT_MAXIMUM
 #define CREST_MAXIMUM_ATTENUATION_DEPTH 1000.0
 #define CREST_FLOAT_MAXIMUM 3.402823466e+38
 

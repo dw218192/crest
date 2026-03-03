@@ -17,7 +17,7 @@ namespace Crest
     public class LodDataMgrSeaFloorDepth : LodDataMgr
     {
         // NOTE: Must match CREST_OCEAN_DEPTH_BASELINE in OceanConstants.hlsl.
-        internal const float k_DepthBaseline = Mathf.Infinity;
+        internal const float k_DepthBaseline = float.MaxValue;
 
         public override string SimName => "SeaFloorDepth";
         protected override GraphicsFormat RequestedTextureFormat => Settings._allowVaryingWaterLevel ? GraphicsFormat.R32G32_SFloat : GraphicsFormat.R16_SFloat;
